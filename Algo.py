@@ -1,4 +1,4 @@
-from random import random,uniform,randrange
+from random import uniform,randrange
 from csv import reader
 
 import time
@@ -10,7 +10,7 @@ global SAMPLE
 SAMPLE = []
 
 FILE = 'position_sample.csv'
-#FILE = 'iman_sample.csv'
+# FILE = 'iman_sample.csv'
 
 with open(FILE,'r',newline = '') as csvfile:
     read = reader(csvfile, delimiter = ';')
@@ -20,10 +20,10 @@ with open(FILE,'r',newline = '') as csvfile:
     for data in read:
         SAMPLE.append([float(value) for value in data])
 
-def individu() -> list[float]:
+def individu() -> list:
     return [uniform(-100.,100.) for _ in range(6)]
 
-def fitness(ind : list[float]) -> float:
+def fitness(ind : list) -> float:
     error = 0.
     for value in SAMPLE: #value de forme [T,X,Y]
         x = ind[0] * np.sin(ind[1] * value[0] + ind[2])
@@ -33,14 +33,14 @@ def fitness(ind : list[float]) -> float:
 
     return error
 
-def select(ind : list[float], hcount : int, lcount : int) -> list[float]:
+def select(ind : list, hcount : int, lcount : int) -> list:
     #Selectionne les premiers et quelques derniers pour avoir une variété
     return ind[0:hcount] + ind[-lcount:]
 
-def evaluate(pop : list[float]) -> list[list[float]]:
+def evaluate(pop : list) -> list:
     return sorted(pop, key = lambda x : fitness(x))
 
-def crossover(a : list[float],b : list[float]) -> tuple[list[float], list[float]]:
+def crossover(a : list[float],b : list[float]) -> tuple[list, list]:
     if len(a) != len(b):
         raise ValueError("Les individus doivent être de la même taille")
     r = randrange(1,len(a))
@@ -50,7 +50,7 @@ def correction(fitness : float) -> float:
     return 30 * (1 - 1/np.exp(fitness/140))
 
 
-def mutate(ind : list[float]) -> list[float]:
+def mutate(ind : list) -> list:
     r = randrange(0,len(ind))
     new_ind = ind
     fit = fitness(new_ind)
@@ -72,13 +72,15 @@ def mutate(ind : list[float]) -> list[float]:
     
     return new_ind
 
-def create_pop(n : int) -> list[list[float]]:
+def create_pop(n : int) -> list:
     return [individu() for _ in range(n)]
 
-def algoG(npop : int = 100, generation : int = 50000, fitlim : int = 1.1) -> tuple[list[float], int]:
+def algoG(npop : int = 100, generation : int = 50000, fitlim : int = 1) -> tuple[list, int]:
     pop = create_pop(npop)
 
     #On itère {generation} fois
+    gen = 0
+
     for gen in range(generation):
 
         pop = evaluate(pop) #Trie notre population
@@ -109,9 +111,9 @@ def algoG(npop : int = 100, generation : int = 50000, fitlim : int = 1.1) -> tup
     print(pop[0])
     return pop[0],gen
 
-def plot(result : list[float] = None, n : int = 1) -> None:
+def plot(result : list[float] = [], n : int = 1) -> None:
 
-    if result != None:
+    if result != []:
         
         p = result
         #Trace notre courbe de x(t) et y(t) avec les paramètres trouvées
@@ -214,4 +216,3 @@ if __name__ == '__main__':
     print(sum(SOLUTIONS)/len(RUNS))
 
     plotMean(RUNS,SOLUTIONS,GENERATIONS)
-    None
